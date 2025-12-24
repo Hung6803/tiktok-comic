@@ -452,8 +452,38 @@
       return state.seriesOutline?.characters || state.characters || [];
     }
 
+    // Load API keys from server config (if set in .env)
+    async function loadConfigFromServer() {
+      try {
+        const response = await fetch('/api/config');
+        const config = await response.json();
+
+        // Only use server keys if localStorage doesn't have them
+        if (config.deepseekKey && !localStorage.getItem('deepseekKey')) {
+          state.deepseekKey = config.deepseekKey;
+          localStorage.setItem('deepseekKey', config.deepseekKey);
+          console.log('✅ DeepSeek API key loaded from server');
+        }
+        if (config.geminiKey && !localStorage.getItem('geminiKey')) {
+          state.geminiKey = config.geminiKey;
+          localStorage.setItem('geminiKey', config.geminiKey);
+          console.log('✅ Gemini API key loaded from server');
+        }
+
+        // Hide API setup if both keys are present
+        if (state.deepseekKey && state.geminiKey) {
+          state.showApiSetup = false;
+        }
+
+        render();
+      } catch (e) {
+        console.log('ℹ️ Could not load config from server:', e.message);
+      }
+    }
+
     // Initialize - load saved stories on page load
     loadSavedStories();
+    loadConfigFromServer();
 
     const GENRES = [
       { id: 'romance', name: 'Tình cảm', icon: '💕', color: '#ff6b9d' },

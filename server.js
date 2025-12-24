@@ -429,6 +429,14 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// Get API keys from environment (for auto-load)
+app.get('/api/config', (req, res) => {
+  res.json({
+    deepseekKey: process.env.DEEPSEEK_API_KEY || '',
+    geminiKey: process.env.GEMINI_API_KEY || ''
+  });
+});
+
 // Serve index.html for all other routes
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
